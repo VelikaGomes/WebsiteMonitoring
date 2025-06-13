@@ -53,9 +53,35 @@ function HomePage() {
     fetchDomains();
   };
 
+  const exportUrls = async()=>{
+    const{data, error }=await supabase.from("domains").select("url");
+    if(error){
+      alert("Failed tp fetch URLs for export");
+      return;
+    }
+    const csvContent=["URL", ...data.map((row)=> row.url)].join("\n");
+    const blob=new Blob ([csvContent], {type:"text/csv;charset=utf-8;"});
+
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.href=url;
+    link.setAttribute("download", "domains_export.csv");
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
-    <div className="container" style={{ margin: "40px" }}>
-      <h2>Website Monitoring Tool</h2>
+    <div className="container" style={{ margin: "40px", maxWidth: "100%" }}>
+      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+        <h1
+          style={{
+            fontSize: "32px",
+            color: "black",
+            margin: "8px",}}>
+          Website Monitoring Tool
+        </h1>
+      </div>
 
       <div
         style={{
@@ -67,18 +93,21 @@ function HomePage() {
       >
         <button
           style={{
-            padding: "10px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "12px 20px",
             color: "black",
-            height: "50px",
-            width: "100px",
             fontWeight: "bold",
             border: "none",
             borderRadius: "8px",
-          }}
-        >
+            height: "50px",
+            width: "100px",
+          }}>
           Import
         </button>
         <button
+        onClick={exportUrls}
           style={{
             padding: "10px",
             height: "50px",
@@ -101,20 +130,17 @@ function HomePage() {
             fontWeight: "bold",
             border: "none",
             borderRadius: "8px",
-          }}
-        >
+          }}>
           {showAll ? "Hide" : "View"}
         </button>
       </div>
-
       <div
         style={{
           display: "flex",
           gap: 10,
           margin: "20px",
           alignItems: "center",
-        }}
-      >
+        }}>
         <input
           type="text"
           placeholder="Enter URL..."
@@ -148,56 +174,59 @@ function HomePage() {
               color: "white",
               fontWeight: "bold",
               borderRadius: "10px",
-            }}
-          >
+            }}>
             Add
           </button>
         )}
       </div>
-
       {showAll && (
-        <div style={{ margin: "40px" }}>
+        <div
+          style={{
+            margin: "40px",
+            backgroundColor: "white",
+            borderRadius: "12px",
+          }}
+        >
           {domains.map((domain) => (
             <div
               key={domain.id}
               style={{
                 marginBottom: "20px",
-                padding: "10px",
-                backgroundColor:"",
+                height:"60px", padding: "10px",
                 borderRadius: "8px",
-              }}
-            >
+                display: "flex",
+                justifyContent: "space-between",alignItems: "center",
+                backgroundColor: "#f9f9f9",
+              }}>
               <span>{domain.url}</span>
-              <div>
+              <div style={{ display: "flex", alignItems: "center" }}>
                 <button
                   onClick={() => startEdit(domain)}
                   style={{
-                    margin: "5px",
-                    height: "40px",
-                    width: "80px",
-                    padding: "15px",
-                    backgroundColor: "#0A1172",
-                    color: "white",
-                    fontWeight: "bold",
-                    borderRadius: "10px",
-                  }}
-                >
-                  Edit
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    margin: "0 8px",
+                    cursor: "pointer",
+                  }}>
+                  <img
+                    src="/icons/editIcon.png"
+                    alt="Edit"
+                    style={{ height: "24px", width: "24px" }}/>
                 </button>
                 <button
                   onClick={() => deleteDomain(domain.id)}
                   style={{
-                    height: "40px",
-                    width: "80px",
-                    margin: "5px",
-                    padding: "15px",
-                    backgroundColor: "#0A1172",
-                    color: "white",
-                    fontWeight: "bold",
-                    borderRadius: "10px",
-                  }}
-                >
-                  Delete
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    margin: "0 8px",
+                    cursor: "pointer",
+                  }}>
+                  <img
+                    src="/icons/deleteIcon.png"
+                    alt="Delete"
+                    style={{ height: "24px", width: "24px" }} />
                 </button>
               </div>
             </div>
