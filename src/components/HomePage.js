@@ -40,20 +40,25 @@ function HomePage() {
           const { error } = await supabase.from("domains").insert(insertData);
 
           if (error) {
-            alert("Failed to import some URLs: " + error.message);
+            alert("Failed to import some URLs");
           } else {
             alert(`${insertData.length} URLs imported successfully!`);
             fetchDomains();
           }
         } catch (err) {
-          alert("Error during import: " + err.message);
+          alert("Error during import");
         }
       },
 
       error: (err) => {
-        alert("Failed to parse CSV file: " + err.message);
+        alert("Failed to parse CSV file");
       },
     });
+  };
+
+  const validUrl = (url) => {
+    const pattern = /^https:\/\/www\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}\/?$/;
+    return pattern.test(url);
   };
 
   const fetchDomains = async () => {
@@ -66,6 +71,12 @@ function HomePage() {
 
   const addDomain = async () => {
     if (!url.trim()) return;
+
+    if (!validUrl(url)) {
+      alert("Please enter a valid URL in the format: https://www.example.com");
+      return;
+    }
+
     const { error } = await supabase.from("domains").insert([{ url }]);
     if (!error) {
       setUrl("");
@@ -130,7 +141,6 @@ function HomePage() {
           Website Monitoring Tool
         </h1>
       </div>
-
       <div
         style={{
           display: "flex",
@@ -190,6 +200,19 @@ function HomePage() {
           }}
         >
           {showAll ? "Hide" : "View"}
+        </button>
+        <button
+          style=
+          {{
+            padding: "10px",
+            height: "50px",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: "8px",
+            color: "black",
+          }}>
+          Generate Screenshots
         </button>
       </div>
       <div
